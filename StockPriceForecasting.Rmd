@@ -1,0 +1,361 @@
+---
+title: "Forecasting Stock Prices"
+author: "Eric Ofori"
+date: "11/1/2020"
+output: pdf_document
+---
+
+
+
+**Title:** *Forecasting Stock Prices Using Machine Learning Methods*
+
+
+**Introduction**
+
+Accurately forecasting stock prices is probably almost impossible, otherwise everyone on Wall Street would be rich. Trends in stock prices are nonlinear and non-stationary time-series, which makes forecasting stock prices a challenging and difficult task in the financial market. Conventional time series models have been used to forecast stock prices, and many researchers are still devoted to the development and improvement of time-series forecasting models. The most well-known conventional time series forecasting approach is autoregressive integrated moving average (ARIMA), which is employed when the time-series data is linear and there are no missing values. Statistical methods, such as traditional time series models, usually address linear forecasting models and variables must obey statistical normal distribution. Therefore, conventional time series methods are not suitable for forecasting stock prices, because stock price fluctuation is usually nonlinear and non-stationary. 
+
+Further, most conventional time-series models utilize one variable (the previous day’s stock price) only, when, there are actually many influential factors, such as market indexes, technical indicators, economics, political environments, investor psychology, and the fundamental financial analysis of companies that can influence forecasting performance. In practice, researchers use many technical indicators as independent variables for forecasting stock prices. How to select the key variables from numerous technical indicators is a critical step in the forecasting process. Investors usually prefer to select technical indicators depending on their experience or feelings for forecasting stock prices despite this behavior be highly risky. However, choosing unrepresentative indicators may result in losing profits for investors. Therefore, selecting the relevant indicators to forecast stock prices is one of the important issues for investors. Financial researchers must identify the key technical indicators that have higher relevance to the stock price by indicator selection. Therefore, proposed models must incorporate indicator selection in the stock forecasting process to enhance forecasting accuracy.
+
+Forecasting stock prices has become a hot topic with the advent of more efficient and precise machine learning methods. To overcome the shortcomings of traditional time series models for estimating stock prices, I investigate and compare two of such as machine learning approaches: ridge regression and Least Absolute Shrinkage and Selection Operator (LASSO) regression. 
+
+
+**Empirical Framework**
+
+There is a set of methods proposed for regression in which the target value is likely to be a linear combination of the input variables. In mathematical notion, if Y is the predicted value, then its value can be obtained from equation 2 as h(x). Ordinary least squares method is one of the generalized linear regression models in which linear regression fits a linear model with coefficients w = (w1,..., wp) to minimize the residual sum of squares between the witnessed responses in the dataset, and the responses forecasted by the linear approximation. Mathematically, it solves a problem of minimizing the expression of type as shown in equation 3. The linear regression can take in its fit method arrays X, y and will accumulate the coefficients w of the linear model in its coef_member. However, the freedom of the model terms decides coefficient assessments for Ordinary Least Squares. This method calculates the least squares solution using a singular value decomposition of X. If X is a matrix of size (n, p) then this method has a cost of O$(np^2)$, if $n \ge p$.
+
+*Mathematical Formulation*\
+
+Consider the set of training vectors $(x_i, y_i), x_n$ belongs to $R_n, y_n$ belongs to $R,$
+
+\begin{equation}
+i= 1,2,3,...,N
+\end{equation}
+
+The hypothesis or the linear regression output is given by
+
+\begin{equation}
+h(x) = \sum_{j=0}^d w_j x_j = w^Tx
+\end{equation}
+
+where $w$ is the weight vector and $d$ is the dimensionality of the problem or the number of features.\
+Also, $x_0 = 1$ has been added to make equation (2) valid.\
+The cost function or the squared error function is defined as\
+
+\begin{equation}
+J(w) = \frac{1}{N} \sum_{i=0}^N (h(x_i) - y_i)^2 = \frac{1}{N} ||Xw - y||^2
+\end{equation}
+
+where
+
+\begin{equation}
+X=\left[
+\begin{array}{ccc}
+   X_1^T \\
+   X_2^T \\
+   \vdots \\
+   X_N^T
+\end{array}
+\right]
+\quad \textrm{and} \quad 
+y=\left[
+\begin{array}{ccc}
+   y_1 \\
+   y_2 \\
+   \vdots \\
+   y_N
+\end{array}
+\right]
+\end{equation}
+
+We need to minimize the objective function to get the optimal value of the weight vector.\
+Minimizing the objective function,
+
+\begin{equation}
+\nabla J(w) = \frac{2}{N} X^T (Xw - y) = 0
+\end{equation}
+
+which implies
+
+\begin{equation}
+X^T Xw = X^T y
+\end{equation}
+
+hence
+
+\begin{equation}
+w = X^+ y
+\end{equation}
+
+where
+
+\begin{equation}
+X^+ = (X^T X)^-1 X^T
+\end{equation}
+
+Putting the value of $w$ from (7) the optimal hypothesis is obtained.\
+The traditional least square method can be modified to Ridge regression model.\
+The objective function for Ridge regression can be specified as
+
+\begin{equation}
+J(w) = \frac{1}{N} \sum_{i=0}^N (h(x_i) - y_i)^2 + \lambda \sum_{j=1}^d w_j^2 = \frac{1}{N} ||Xw - y||^2 + \lambda \sum_{j=1}^d w_j^2
+\end{equation}
+
+where $\lambda$ is the regularization parameter. After minimizing the cost function, we get the coefficients as
+
+\begin{equation}
+w = (X^T X + \lambda I)^-1 X^T y
+\end{equation}
+
+Another modification of the least square method is the LASSO model. It is valuable due to its affinity to prefer solutions with fewer parameter values, efficiently decreasing the number of variables upon which the given solution is dependent.\
+The objective function for LASSO can be defined as
+
+\begin{equation}
+J(w) = \frac{1}{N} \sum_{i=0}^N (h(x_i) - y_i)^2 + \lambda \sum_{j=1}^d |w_j| = \frac{1}{N} ||Xw - y||^2 + \lambda \sum_{j=1}^d |w_j|
+\end{equation}
+
+The added term corresponds to $l_1$-norm. The lasso estimate thus explains the minimization of the least square penalty with $\lambda||w||_1$ added where  $\lambda$ is regularization parameter and $||w||_1$ is the $l_1$-norm of the parameter vector.
+
+
+**Data and Methods**
+
+The research data utilized for forecasting stock market prices in this study was obtained from Yahoo Finance using the quantmod package in R. The total number of instances considered for this study were 2130 trading days, from December 13th 2010 to June 7th 2019. The data is composed of daily information including adjusted price and volume traded for Apple, adjusted price for stock market indexes; Dow Jones Industrial Average (DJI), Nasdaq Composite (NASDAQ), S&P 500 Index (S&P). The training data set was selected as the first 80% of the sample, while the testing data consisted the remaining 20% of the sample.\
+
+I choose an $P_t$ autoregressive AR(N) model of daily prices as the benchmark because of its widespread use in the literature and its relatively good performance in predicting time-series information, particularly prices (e.g. Conejo et al. 2005; Weron 2006; Misiorek et al. 2006).\
+Specifically, I specify an $N^{th}$ order autoregressive AR(N) model as
+
+\begin{equation}
+AP_t = \alpha  + \sum_{i=1}^N \beta_i AP_{t-i} + \sum_{i=0}^{kN} \gamma_{ki} D_{kt-ki} + \epsilon_t
+\end{equation}
+
+where $AP_t$ is daily adjusted price of Apple, $D_{k}$ is a vector of exogenous variables including; volume traded for Apple, adjusted price for DJI, NASDAQ, and S&P.\
+From (12), we note that number of observations $N$ $<$ number of parameters $p$, where $N = 1704$ and $p = 10649$; thus, cannot be estimated by OLS. I therefore estimate a ridge and LASSO regression and comapre results from the two estimations.\
+
+The performance of the ridge and LASSO regression methods were measured by computing root mean square error (RMSE) and the mean absolute percentage error (MAPE).\
+The RSME is represented as:
+
+\begin{equation}
+RSME = \sqrt{\frac{\sum_{i=1}^N (y_i - p_i)^2}{N}}
+\end{equation}
+
+MAPE is found by calculating the absolute value of the variation between the actual stock price and the expected stock price. The MAPE is represented as:
+
+\begin{equation}
+MAPE = \frac{\sum_{i=1}^N \frac{|y_i - p_i|}{y_i}} N 100 \%
+\end{equation}
+
+where $N$ is the total number of trading days $p_i$ is the predicted stock price on day $i$ and $y_i$ is the actual stock price on the same day.\
+
+
+**Results and Discussion**
+```{r data_prep, include = FALSE}
+rm(list = ls());gc()
+set.seed(123) #algorithm for reproducability
+library(quantmod)
+library(tidyverse)
+
+#Loads the company stock using ticker
+getSymbols("AAPL",from="1980-01-01",to="2019-11-30")
+getSymbols("NDAQ",from="1980-01-01",to="2019-11-30")
+getSymbols("DJI",from="1980-01-01",to="2019-11-30")
+getSymbols("^GSPC",from="1980-01-01",to="2019-11-30")
+
+dat1 <- merge(AAPL,DJI,GSPC,NDAQ)
+class(dat1)
+data <- as.data.frame(dat1)
+data <- na.omit(data)
+class(data)
+
+df <- data %>% select(c(AAPL.Adjusted, AAPL.Volume, DJI.Adjusted, GSPC.Adjusted, NDAQ.Adjusted))
+
+for(var in names(df)){
+  for(Lg in 1:nrow(df)){
+    df[,paste0(var,".lag",Lg)]<-lag(df[,paste0(var)],Lg)
+  }
+}
+
+class(df)
+
+df1 <- df[, -which(colMeans(is.na(df)) > 0.5)]
+df2 <- na.omit(df1)
+
+train_nrow <- (nrow(df2))*0.8 # last row index for training data
+test_nrow <- train_nrow + 1 # first row index for test data
+
+train_dat = df2 [1:train_nrow,]
+y_train <- as.numeric(train_dat$AAPL.Adjusted)
+X_train = train_dat[, -1]
+matrix_X_train <- data.matrix(X_train)
+test_dat = df2 [test_nrow:nrow(df2),] 
+y_test <- as.numeric(test_dat$AAPL.Adjusted)
+X_test= test_dat[, -1]
+matrix_X_test <- data.matrix(X_test)
+```
+
+```{r regression_lib, include=FALSE}
+###############################
+#Ridge regression model########
+###############################
+library(glmnet)
+```
+
+
+**Figure 1: CV Plot for Ridge Regression method**
+
+```{r ridge_cv_plot, echo=FALSE}
+lambda_seq <- 10^seq(2, -2, by = -.1)
+# identify the best lamda value
+ridge_cv_out <- cv.glmnet(matrix_X_train, y_train, alpha = 0, lambda = lambda_seq)
+plot(ridge_cv_out)
+```
+
+```{r ridge_best_lam, echo=FALSE}
+# best lamda
+ridge_best_lam <- ridge_cv_out$lambda.min
+```
+The best lambda for ridge regression method is `r ridge_best_lam` 
+
+```{r ridge_misc, include=FALSE}
+# Rebuilding the model with best lamda value identified
+ridge_best_out <- glmnet(matrix_X_train, y_train, alpha = 0, lambda = ridge_best_lam )
+#preditions
+ridge_pred <- predict(ridge_best_out, s = ridge_best_lam, newx = matrix_X_test)
+
+coef(ridge_best_out) #check out the coefficients
+
+# count the number of predictors included in the model
+ridge_z <- coef(ridge_best_out, s = ridge_best_lam)[-1]
+sum(ridge_z !=0)
+
+# investigate the predictors included in the model
+names(ridge_z) = rownames(coef(ridge_best_out, s = ridge_best_lam))[-1]
+round(sort(ridge_z[ridge_z != 0]), 5)
+```
+
+
+**Figure 2: CV Plot for LASSO Regression method**
+
+```{r lasso_cv_plot, echo=FALSE}
+###############################
+#Lasso regression model########
+###############################
+# identify the best lamda value
+lasso_cv_out <- cv.glmnet(matrix_X_train, y_train, alpha = 1, lambda = lambda_seq)
+plot(lasso_cv_out)
+```
+
+```{r lasso_best_lam, echo=FALSE}
+# best lamda
+lasso_best_lam <- lasso_cv_out$lambda.min
+```
+The best lambda for ridge regression method is `r lasso_best_lam`
+
+```{r lasso_regression_results, include=FALSE}
+# Rebuilding the model with best lamda value identified
+lasso_best_out <- glmnet(matrix_X_train, y_train, alpha = 1, lambda = lasso_best_lam)
+#preditions
+lasso_pred <- predict(lasso_best_out, s = lasso_best_lam, newx = matrix_X_test)
+
+coef(lasso_best_out) #check out the coefficients
+```
+
+
+```{r lasso_regression_predictor_count, echo=FALSE}
+# count the number of predictors included in the model
+lasso_z <- coef(lasso_best_out, s = lasso_best_lam)[-1]
+lasso_predictor_count <- sum(lasso_z !=0)
+
+# investigate the number of predictors included in the model
+names(lasso_z) = rownames(coef(lasso_best_out, s = lasso_best_lam))[-1]
+lasso_predictors <-round(sort(lasso_z[lasso_z != 0]), 5)
+library(reshape2)
+lasso_predictors.m <- melt(lasso_predictors)
+Predictors <- rownames(lasso_predictors.m)
+final_predictors <- data.frame(Predictors, lasso_predictors.m)
+colnames(final_predictors) <- c("Predictor", "Coefficient")
+rownames(final_predictors) <- NULL
+```
+The number of predictors included the LASSO model is `r lasso_predictor_count`. 
+
+```{r echo=FALSE, results='asis'}
+library(knitr)
+kable(final_predictors, caption= "LASSO Regression Predictors and Coefficients")
+```
+
+
+```{r RMSE, echo=FALSE}
+################
+#check RMSE######
+###############
+# root mean square error for ridge
+ridge_RMSE <- sqrt(mean((y_test - ridge_pred)^2))
+# root mean square error for LASSO
+LASSO_RMSE <- sqrt(mean((y_test - lasso_pred)^2))
+```
+Table 1 presents results of performance measures for both methods.
+The RMSE for LASSO regression method is `r LASSO_RMSE` which is less than the RMSE for ridge regression method `r ridge_RMSE`.
+
+```{r MAPE, echo=FALSE}
+################
+#check MAPE######
+###############
+# root mean square error for ridge
+ridge_MAPE <- mean(abs((y_test - ridge_pred)/y_test))*100
+# root mean square error for LASSO
+LASSO_MAPE <- mean(abs((y_test  - lasso_pred)/y_test))*100
+```
+Also, the MAPE for LASSO regression method is `r LASSO_MAPE` which is less than the MAPE for ridge regression method `r ridge_MAPE`.
+
+```{r echo=FALSE, results='asis'}
+result <- data.frame(Method=c("Ridge", "LASSO"), RMSE = c(ridge_RMSE, LASSO_RMSE), MAPE = c(ridge_MAPE, LASSO_MAPE))
+kable(result, caption= "Performance Measures")
+```
+
+
+**Figure 3: Actual versus Predicted Stock Prices**
+
+```{r plotsd, echo=FALSE}
+################################################
+###compare predicted prices to actual prices####
+################################################
+rownames(test_dat) <- NULL
+pred_date <- rownames(test_dat)
+final <- data.frame(pred_date,y_test,lasso_pred,ridge_pred)
+colnames(final) <- c("Date", "Actual","LASSO", "Ridge")
+rownames(final) <- NULL
+
+######################
+###PLOTS#############
+#####################
+ggplot()+
+    geom_line(data=final,aes(y=Actual,x= order(Date),colour="darkblue"),size=1 )+
+    geom_line(data=final,aes(y=Ridge,x= order(Date),colour="red"),size=1) +
+    geom_line(data=final,aes(y=LASSO,x= order(Date),colour="green"),size=1) +
+    scale_color_discrete(name = "Method", labels = c("Actaul", "LASSO", "Ridge")) +
+    ylab("Stock Price") + xlab("Days")
+```
+
+
+**Conclusion and Future Work**
+
+LASSO regression method outperforms ridge regression in predicting Apple stock prices shown by the values of RMSE and MAPE for both methods.\
+Future work would need to explore more sources of data such financial text data such news the Wall Street Journal. Also, it will be important to explore other machine learning methods such as nueral networks. However, this study provides ample evidence of the importance of such methods especially in situations where OLS is not feasible; in predicting stock prices.
+
+
+**References**
+
+1. Bessembinder H. Quote-based competition and trade execution costs in NYSE-listed stocks. Journal of Financial Economics. 2003; 70: 385–422 \
+
+2. Box GEP, Jenkins GM. Time series analysis: forecasting and control. San Francisco: Holden-Day; 1970 \
+
+3. Kao LJ, Chiu CC, Lu CJ, Yang JL. Integration of nonlinear independent component analysis and support vector regression for stock price forecasting. Neurocomputing. 2013; 99: 534–542 \
+
+4. Leigh W, Pussell R, Ragusa JM. Forecasting the NYSE composite index with technical analysis, pattern recognizer, neural network, and genetic algorithm: a case study in romantic decision support. Decision Support Systems. 2002; 32: 361–377 \
+
+5. Lütkepohl H (2005) New introduction to multiple time series analysis. Springer, Berlin \
+
+6. Pathak, A.: Predictive time series analysis of stock prices using neural network classifier. International Journal of Computer Science and Engineering Technology, 2229–3345 (2014) \
+
+7. Tsai CF, Lin YC, Yen DC, Chen YM. Predicting stock returns by classifier ensembles. Applied Soft Computing. 2011; 11: 2452–2459.
+
+
+
